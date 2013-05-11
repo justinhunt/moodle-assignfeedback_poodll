@@ -16,6 +16,10 @@ Beneath that you will see a choice of PoodLL recorders to use in the submission.
 3) Audio Recording (via PoodLL's Red Server tokyo.poodll.com)
 4) Whiteboard (draw pictures)
 
+Moodle caching can affect audio/video playback reliability. To turn off text filter caching:  
+Go to: Site Administration -> Plugins -> Filters ->Common Filter Settings
+There set "Text Cache Lifetime" to "no"
+
 *Please be aware that the PoodLL feedback type relies on the PoodLL Filter being installed, and won't work properly otherwise*
 
 Good luck.

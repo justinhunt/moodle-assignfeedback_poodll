@@ -178,6 +178,11 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 	//the recorder updates that field with the filename of the audio/video it recorded. We pick up that filename here.
         $filename = optional_param(FP_FILENAMECONTROL, '', PARAM_RAW);
         $draftitemid = optional_param('draftitemid', '', PARAM_RAW);
+		
+		//Don't do anything in this case
+		//possibly the user is just updating something else on the page(eg grade)
+		//if we overwrite here, we might trash their existing poodllfeedback file
+		if($filename==''){return;}
         
         //if this should fail, we get regular user context, is it the same anyway?
         $usercontextid = optional_param('usercontextid', '', PARAM_RAW);
@@ -273,6 +278,9 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		$mform->addElement('hidden', 'draftitemid', $draftitemid);
 		$mform->addElement('hidden', 'usercontextid', $usercontextid);	
 		$mform->addElement('hidden', FP_FILENAMECONTROL, '',array('id' => FP_FILENAMECONTROL));
+		$mform->setType('draftitemid', PARAM_INT);
+		$mform->setType('usercontextid', PARAM_INT); 
+		$mform->setType(FP_FILENAMECONTROL, PARAM_TEXT); 
 	
                 //no timelimit on recordings
                 $timelimit=0;
@@ -412,7 +420,7 @@ function fetch_responses($gradeid, $embed=false){
 		
         //if this is a playback area, for teacher, show a string if no file
         if (empty($filename)){ 
-                                $responsestring .= " - - ";
+                                $responsestring .= "";
         }else{	
                 //The path to any media file we should play
                 $mediapath = $CFG->wwwroot.'/pluginfile.php/'.$this->assignment->get_context()->id 

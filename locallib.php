@@ -423,44 +423,58 @@ function fetch_responses($gradeid, $embed=false){
                                 $responsestring .= "";
         }else{	
                 //The path to any media file we should play
-                $mediapath = $CFG->wwwroot.'/pluginfile.php/'.$this->assignment->get_context()->id 
+                $rawmediapath = $CFG->wwwroot.'/pluginfile.php/'.$this->assignment->get_context()->id 
 						. '/assignfeedback_poodll/' . ASSIGNFEEDBACK_POODLL_FILEAREA  . '/'.$gradeid.'/'.$filename;
-                $mediapath = urlencode($mediapath);
+                $mediapath = urlencode($rawmediapath);
 
                 //prepare our response string, which will parsed and replaced with the necessary player
                 switch($this->get_config('recordertype')){
 
                         case FP_REPLYVOICE:
+                        	//use poodll filter here, otherwise it would display in a video player
+    						$responsestring .= format_text('{POODLL:type=audio,path='.	$mediapath .',protocol=http,embed=' . $embed . ',embedstring='. $embedstring .'}', FORMAT_HTML);
+							if($this->get_config('downloadsok')){
+								$responsestring .= "<a href='" . $rawmediapath . "'>" 
+										. get_string('downloadfile', 'assignfeedback_poodll') 
+										."</a>";
+							}
+							
+							break;						
+                    
+                        
                         case FP_REPLYMP3VOICE:
-                                        $responsestring .= format_text('{POODLL:type=audio,path='.	$mediapath 
-												.',protocol=http,embed=' . $embed . ',embedstring='. $embedstring .'}', FORMAT_HTML);
-										if($this->get_config('downloadsok')){
-											$responsestring .= "<a href='" . urldecode($mediapath) . "'>" 
-													. get_string('downloadfile', 'assignfeedback_poodll') 
-													."</a>";
-										}
-                                        
-                                        break;						
+							//originally tried to force poodll, but best to default to whatever
+							//$responsestring .= format_text('{POODLL:type=audio,path='.	$mediapath .',protocol=http,embed=' . $embed . ',embedstring='. $embedstring .'}', FORMAT_HTML);
+							$responsestring .= format_text("<a href=\"$rawmediapath\">$filename</a>", FORMAT_HTML);
+							if($this->get_config('downloadsok')){
+								$responsestring .= "<a href='" . $rawmediapath . "'>" 
+										. get_string('downloadfile', 'assignfeedback_poodll') 
+										."</a>";
+							}
+							
+							break;						
 
                         case FP_REPLYVIDEO:
-                                        $responsestring .= format_text('{POODLL:type=video,path='.	
-											$mediapath .',protocol=http,embed=' . $embed . ',embedstring='. $embedstring .'}', FORMAT_HTML);
-                                        break;
+                        	//originally tried to force poodll, but best to default to whatever
+                            //$responsestring .= format_text('{POODLL:type=video,path='.$mediapath .',protocol=http,embed=' . $embed . ',embedstring='. $embedstring .'}', FORMAT_HTML);
+                            $responsestring .= format_text("<a href=\"$rawmediapath\">$filename</a>", FORMAT_HTML);
+                            break;
 
                         case FP_REPLYWHITEBOARD:
                                 $responsestring .= "<img alt=\"submittedimage\" width=\"" . $CFG->filter_poodll_videowidth 
-										. "\" src=\"" . urldecode($mediapath) . "\" />";
+										. "\" src=\"" . $rawmediapath . "\" />";
                                 break;
 
                         case FP_REPLYSNAPSHOT:
                                 $responsestring .= "<img alt=\"submittedimage\" width=\"" . $CFG->filter_poodll_videowidth 
-										. "\" src=\"" . urldecode($mediapath) . "\" />";
+										. "\" src=\"" . $rawmediapath . "\" />";
                                 break;
 
                         default:
-                                $responsestring .= format_text('{POODLL:type=audio,path='.	$mediapath 
-										.',protocol=http,embed=' . $embed . ',embedstring='. $embedstring .'}', FORMAT_HTML);
-                                //$responsestring .= "hello" . fetchSimpleAudioPlayer('auto', $mediapath, 'http',700,25);
+                        		//originally tried to force poodll, but best to default to whatever
+                                //$responsestring .= format_text('{POODLL:type=audio,path='.	$mediapath .',protocol=http,embed=' . $embed . ',embedstring='. $embedstring .'}', FORMAT_HTML);
+                                $responsestring .= format_text("<a href=\"$rawmediapath\">$filename</a>", FORMAT_HTML);
+					break;
                                 break;	
 
                 }//end of switch

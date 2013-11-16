@@ -309,11 +309,6 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 					case "600x800": $width=600;$height=800;break;
 					case "800x600": $width=800;$height=600;break;
 				}
-				
-				//compensation for borders and control panel
-				//the board size is the size of the drawing canvas, not the widget
-				$width = $width + 205;
-				$height = $height + 20;
 
 				
 				$imageurl="";

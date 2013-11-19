@@ -43,4 +43,5 @@ $string['allowedrecorders'] = 'Recorders to enable';
 $string['allowedrecordersdetails'] = '';
 $string['showcurrentfeedback'] = 'Show Current Feedback';
 $string['showcurrentfeedbackdetails'] = 'Show previously recorded PoodLL feedback on feedback form, for teacher benefit.';
+$string['reallydeletefeedback'] = 'Really delete this feedback?';
 

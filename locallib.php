@@ -182,7 +182,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		//Don't do anything in this case
 		//possibly the user is just updating something else on the page(eg grade)
 		//if we overwrite here, we might trash their existing poodllfeedback file
-		if($filename==''){return;}
+		if($filename==''){return false;}
         
         //if this should fail, we get regular user context, is it the same anyway?
         $usercontextid = optional_param('usercontextid', '', PARAM_RAW);
@@ -198,7 +198,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		//if filename = -1 we are being told to delete the file
 		//so we have done enough
 		if($filename==-1){
-			return;
+			return '';
 		}
 		
 		//fetch the file info object for our original file
@@ -223,6 +223,8 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 			);
 			$ret = $draft_fileinfo->copy_to_storage($file_record);
 		}//end of if $draft_fileinfo
+		
+		return $filename;
 
 	}//end of shift_draft_file
     
@@ -277,7 +279,8 @@ class assign_feedback_poodll extends assign_feedback_plugin {
             $currentfeedback = $this->fetch_responses($gradeid);
             if($currentfeedback != ''){
             	$deletefeedback = "<a href='javascript:void(0);' onclick='M.assignfeedback_poodll.deletefeedback();'>".
-            						"<img src='" . $CFG->httpswwwroot . '/mod/assign/feedback/poodll/pix/deletebutton.png' . "' alt='delete'/>" . 
+            						"<img src='" . $CFG->httpswwwroot . '/mod/assign/feedback/poodll/pix/deletebutton.png' . 
+									"' alt='" . get_string('deletefeedback','assignfeedback_poodll') . "'/>" . 
             						"</a>";
             	$currentfeedback .= $deletefeedback;
             }
@@ -376,14 +379,19 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         global $DB;
         
         //Move recorded files from draft to the correct area
-	$this->shift_draft_file($grade);
+        //if shift_draft_file is false, no change, so do nothing
+        //if it is an empty string, user has deleted file, so we clear it too
+		$filename = $this->shift_draft_file($grade);
+		if($filename === false){return;}
         
         $feedbackpoodll = $this->get_feedback_poodll($grade->id);
         if ($feedbackpoodll) {
+        	$feedbackpoodll->filename = $filename;
             return $DB->update_record('assignfeedback_poodll', $feedbackpoodll);
         } else {
             $feedbackpoodll = new stdClass();
             $feedbackpoodll->grade = $grade->id;
+            $feedbackpoodll->filename = $filename;
             $feedbackpoodll->assignment = $this->assignment->get_instance()->id;
             return $DB->insert_record('assignfeedback_poodll', $feedbackpoodll) > 0;
         }
@@ -429,10 +437,18 @@ function fetch_responses($gradeid, $embed=false){
         $files = $fs->get_area_files($this->assignment->get_context()->id, 
 				ASSIGNFEEDBACK_POODLL_COMPONENT, ASSIGNFEEDBACK_POODLL_FILEAREA, $gradeid, "id", false);
         if (!empty($files)) {
-            foreach ($files as $file) {
-                $filename = $file->get_filename();
-				break;
-            }
+           //if the filename property exists, and is filled, use that to fetch the file
+			$poodllfeedback= $this->get_feedback_poodll($gradeid);
+			if(isset($poodllfeedback->filename) && !empty($poodllfeedback->filename)){
+				$filename =  $poodllfeedback->filename;
+				
+			//if no filename property just take the first file. That is how we used to do it	
+			}else{
+				foreach ($files as $file) {
+					$filename = $file->get_filename();
+					break;
+				}
+			}
 	}
 		
         //if this is a playback area, for teacher, show a string if no file

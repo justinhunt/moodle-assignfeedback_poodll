@@ -187,7 +187,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         //if this should fail, we get regular user context, is it the same anyway?
         $usercontextid = optional_param('usercontextid', '', PARAM_RAW);
         if ($usercontextid == ''){
-        	$usercontextid = get_context_instance(CONTEXT_USER, $USER->id)->id;
+        	$usercontextid = context_user::instance($USER->id)->id;
         }
          
          $fs = get_file_storage();
@@ -202,7 +202,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		}
 		
 		//fetch the file info object for our original file
-		$original_context = get_context_instance_by_id($usercontextid);
+		$original_context = context::instance_by_id($usercontextid);
 		$draft_fileinfo = $browser->get_file_info($original_context, 'user','draft', $draftitemid, '/', $filename);
 
  		//perform the copy	
@@ -298,7 +298,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         }
 
 		//We prepare our form here and fetch/save data in SAVE method
-		$usercontextid=get_context_instance(CONTEXT_USER, $USER->id)->id;
+		$usercontextid=context_user::instance($USER->id)->id;
 		$draftitemid = file_get_submitted_draft_itemid(FP_FILENAMECONTROL);
 		$contextid=$this->assignment->get_context()->id;
 		file_prepare_draft_area($draftitemid, $contextid, ASSIGNFEEDBACK_POODLL_COMPONENT, ASSIGNFEEDBACK_POODLL_FILEAREA, $gradeid, null,null);

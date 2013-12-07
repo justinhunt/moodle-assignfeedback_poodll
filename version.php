@@ -29,4 +29,4 @@ $plugin->requires  = 2012062500;
 $plugin->component = 'assignfeedback_poodll';
 $plugin->maturity  = MATURITY_BETA;
 $plugin->release   = '1.0.3 (Build 2013120500)';
-$plugin->dependencies = array('filter_poodll' => 2012120400);
+$plugin->dependencies = array('filter_poodll' => 2013120500);

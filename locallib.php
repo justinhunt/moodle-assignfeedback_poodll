@@ -182,7 +182,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		//Don't do anything in this case
 		//possibly the user is just updating something else on the page(eg grade)
 		//if we overwrite here, we might trash their existing poodllfeedback file
-		if($filename==''){return false;}
+		if($filename=='' || $filename==null){return false;}
         
         //if this should fail, we get regular user context, is it the same anyway?
         $usercontextid = optional_param('usercontextid', '', PARAM_RAW);
@@ -382,7 +382,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         //if shift_draft_file is false, no change, so do nothing
         //if it is an empty string, user has deleted file, so we clear it too
 		$filename = $this->shift_draft_file($grade);
-		if($filename === false){return;}
+		if($filename === false){return true;}
         
         $feedbackpoodll = $this->get_feedback_poodll($grade->id);
         if ($feedbackpoodll) {

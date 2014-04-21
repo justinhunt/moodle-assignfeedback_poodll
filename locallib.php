@@ -272,6 +272,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         global $USER,$PAGE,$CFG;
         
         $PAGE->requires->js(new moodle_url($CFG->httpswwwroot . '/mod/assign/feedback/poodll/module.js'));
+        $displayname = $this->get_name();
 		 
         $gradeid = $grade ? $grade->id : 0;
         
@@ -286,7 +287,9 @@ class assign_feedback_poodll extends assign_feedback_plugin {
             }
             $currentcontainer = 'currentfeedbackwrapper';
             $currentfeedback = "<div id='" .$currentcontainer. "'>" . $currentfeedback . "</div>";
-             $mform->addElement('static', 'currentfeedback', '',$currentfeedback);
+             $mform->addElement('static', 'currentfeedback', $displayname,$currentfeedback);
+             //reset the display name so it doesn't show with the recorder
+             $displayname="";
              
              $opts = array(
 				"filecontrolid"=> FP_FILENAMECONTROL,
@@ -318,12 +321,12 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 			case FP_REPLYVOICE:
 				$mediadata= fetchAudioRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL, 
 						$usercontextid ,'user','draft',$draftitemid,$timelimit);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 				
 			case FP_REPLYMP3VOICE:
 				$mediadata= fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 				
 			case FP_REPLYWHITEBOARD:
@@ -341,19 +344,19 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 				$imageurl="";
 				$mediadata= fetchWhiteboardForSubmission(FP_FILENAMECONTROL, 
 						$usercontextid ,'user','draft',$draftitemid, $width, $height, $imageurl);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 			
 			case FP_REPLYSNAPSHOT:
 				$mediadata= fetchSnapshotCameraForSubmission(FP_FILENAMECONTROL,
 						"snap.jpg" ,350,400,$usercontextid ,'user','draft',$draftitemid);
-				$mform->addElement('static', 'description', '',$mediadata);
+				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 
 			case FP_REPLYVIDEO:
 				$mediadata= fetchVideoRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL, 
 						$usercontextid ,'user','draft',$draftitemid,$timelimit);
-				$mform->addElement('static', 'description', '',$mediadata);			
+				$mform->addElement('static', 'description',$displayname,$mediadata);			
 									
 				break;
 					

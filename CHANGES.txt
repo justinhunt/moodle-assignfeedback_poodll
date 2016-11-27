@@ -1,5 +1,8 @@
 Change List
 =========
+Version 2016112701
+Fixed an issue where widths were pulled from a  missing poodll property
+
 Version 2016081402
 Fixed problem with Feedback where files didn't save
 

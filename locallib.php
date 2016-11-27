@@ -477,13 +477,11 @@ function fetch_responses($gradeid){
                             break;
 
                         case FP_REPLYWHITEBOARD:
-                                $responsestring .= "<img alt=\"submittedimage\" width=\"" . $CFG->filter_poodll_videowidth 
-										. "\" src=\"" . $rawmediapath . "\" />";
+                                $responsestring .= "<img alt=\"submittedimage\" class=\"assignfeedback_poodll_whiteboardwidth\" src=\"" . $rawmediapath . "\" />";
                                 break;
 
                         case FP_REPLYSNAPSHOT:
-                                $responsestring .= "<img alt=\"submittedimage\" width=\"" . $CFG->filter_poodll_videowidth 
-										. "\" src=\"" . $rawmediapath . "\" />";
+                                $responsestring .= "<img alt=\"submittedimage\" class=\"assignfeedback_poodll_snapshotwidth\" src=\"" . $rawmediapath . "\" />";
                                 break;
 
                         default:

@@ -313,13 +313,6 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		
 		//fetch the required "recorder
 		switch($this->get_config('recordertype')){
-			
-
-            case FP_REPLYVOICE:
-			case FP_REPLYMP3VOICE:
-				$mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
-				$mform->addElement('static', 'description',$displayname,$mediadata);
-				break;
 				
 			case FP_REPLYWHITEBOARD:
 				//get board sizes
@@ -351,6 +344,13 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 				$mform->addElement('static', 'description',$displayname,$mediadata);			
 									
 				break;
+
+            case FP_REPLYVOICE:
+            case FP_REPLYMP3VOICE:
+            default:
+                $mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
+                $mform->addElement('static', 'description',$displayname,$mediadata);
+                break;
 					
 		}
 

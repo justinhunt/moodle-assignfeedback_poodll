@@ -308,11 +308,20 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		$mform->setType('usercontextid', PARAM_INT); 
 		$mform->setType(FP_FILENAMECONTROL, PARAM_TEXT); 
 	
-                //no timelimit on recordings
-                $timelimit=0;
+        //no timelimit on recordings
+        $timelimit=0;
+
+        //get saved values and return them as defaults
+        $recordertype = $this->get_config('recordertype');
+
+        //convert old Red5 refs to audio media type option
+        if($recordertype==FP_REPLYVOICE){
+            $recordertype = FP_REPLYMP3VOICE;
+            $this->set_config('recordertype', FP_REPLYMP3VOICE);
+        }
 		
 		//fetch the required "recorder
-		switch($this->get_config('recordertype')){
+		switch($recordertype){
 				
 			case FP_REPLYWHITEBOARD:
 				//get board sizes
@@ -347,7 +356,6 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 
             case FP_REPLYVOICE:
             case FP_REPLYMP3VOICE:
-            default:
                 $mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
                 $mform->addElement('static', 'description',$displayname,$mediadata);
                 break;

@@ -313,12 +313,6 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 
         //get saved values and return them as defaults
         $recordertype = $this->get_config('recordertype');
-
-        //convert old Red5 refs to audio media type option
-        if($recordertype==FP_REPLYVOICE){
-            $recordertype = FP_REPLYMP3VOICE;
-            $this->set_config('recordertype', FP_REPLYMP3VOICE);
-        }
 		
 		//fetch the required "recorder
 		switch($recordertype){

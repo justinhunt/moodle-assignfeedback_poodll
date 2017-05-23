@@ -354,9 +354,9 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 					
 		}
 
-        // hidden params
-        $mform->addElement('hidden', 'id', 0);
-        $mform->setType('id', PARAM_INT);
+        // hidden params: Pretty sure we don't need this. Justin 20170523
+        //$mform->addElement('hidden', 'id', 0);
+        //$mform->setType('id', PARAM_INT);
 	return true;
 
     }

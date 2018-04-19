@@ -15,35 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for assignsubmission_onlinepoodll.
+ * Privacy Subsystem implementation for assignfeedback_poodll.
  *
- * @package    assignsubmission_onlinepoodll
+ * @package    assignfeedback_poodll
  * @copyright  2018 Justin Hunt https://poodll.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace assignsubmission_onlinepoodll\privacy;
+namespace assignfeedback_poodll\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
-require_once($CFG->dirroot . '/mod/assign/submission/onlinepoodll/locallib.php');
+require_once($CFG->dirroot . '/mod/assign/feedback/poodll/locallib.php');
 
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\metadata\provider as metadataprovider;
-use \core_privacy\local\request\writer;
-use \core_privacy\local\request\contextlist;
-use \mod_assign\privacy\submission_request_data;
+use \mod_assign\privacy\assignfeedback_provider;
+use \mod_assign\privacy\feedback_request_data;
 
 /**
- * Privacy Subsystem for assignsubmission_onlinepoodll implementing null_provider.
+ * Privacy Subsystem for assignfeedback_poodll implementing null_provider.
  *
  * @copyright  2018 Justin Hunt https://poodll.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadataprovider, \mod_assign\privacy\assignsubmission_provider {
+class provider implements metadataprovider, \mod_assign\privacy\assignfeedback_provider {
     use \core_privacy\local\legacy_polyfill;
-    use \mod_assign\privacy\assignsubmission_provider\legacy_polyfill;
+    use \mod_assign\privacy\assignfeedback_provider\legacy_polyfill;
 
 
     /**
@@ -57,12 +56,13 @@ class provider implements metadataprovider, \mod_assign\privacy\assignsubmission
         return $collection;
     }
     /**
-     * This is covered by mod_assign provider and the query on assign_submissions.
+    * No need to fill in this method as all information can be acquired from the assign_grades table in the mod assign
+     * provider.
      *
      * @param  int $userid The user ID that we are finding contexts for.
      * @param  contextlist $contextlist A context list to add sql and params to for contexts.
      */
-    public static function _get_context_for_userid_within_submission($userid, contextlist $contextlist) {
+    public static function _get_context_for_userid_within_feedback($userid, contextlist $contextlist) {
         // This is already fetched from mod_assign.
     }
     /**
@@ -76,58 +76,59 @@ class provider implements metadataprovider, \mod_assign\privacy\assignsubmission
     /**
      * Export all user data for this plugin.
      *
-     * @param  submission_request_data $exportdata Data used to determine which context and user to export and other useful
+     * @param  feedback_request_data $exportdata Data used to determine which context and user to export and other useful
      * information to help with exporting.
      */
-    public static function _export_submission_user_data(submission_request_data $exportdata) {
-        // We currently don't show submissions to teachers when exporting their data.
-        $context = $exportdata->get_context();
-        if ($exportdata->get_user() != null) {
-            return null;
-        }
-        $user = new \stdClass();
+    public static function _export_feedback_user_data(feedback_request_data $exportdata) {
+        $currentpath = $exportdata->get_subcontext();
+        $currentpath[] = get_string('privacy:path', ASSIGNFEEDBACK_POODLL_COMPONENT);
         $plugin = $exportdata->get_subplugin();
-        $files = $plugin->get_files($exportdata->get_submission(), $user);
-        foreach ($files as $file) {
-            $userid = $exportdata->get_submission()->userid;
-            writer::with_context($exportdata->get_context())->export_file($exportdata->get_subcontext(), $file);
-            // Plagiarism data.
-            $coursecontext = $context->get_course_context();
-            \core_plagiarism\privacy\provider::export_plagiarism_user_data($userid, $context, $exportdata->get_subcontext(), [
-                'cmid' => $context->instanceid,
-                'course' => $coursecontext->instanceid,
-                'userid' => $userid,
-                'file' => $file
-            ]);
+        $gradeid = $exportdata->get_grade()->id;
+        $filefeedback = $plugin->get_file_feedback($gradeid);
+        if ($filefeedback) {
+            $fileareas = $plugin->get_file_areas();
+            $fs = get_file_storage();
+            foreach ($fileareas as $filearea => $notused) {
+                \core_privacy\local\request\writer::with_context($exportdata->get_context())
+                    ->export_area_files($currentpath, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea, $gradeid);
+            }
         }
     }
+
     /**
      * Any call to this method should delete all user data for the context defined in the deletion_criteria.
      *
-     * @param  submission_request_data $requestdata Information useful for deleting user data.
+     * @param  feedback_request_data $requestdata Data useful for deleting user data from this sub-plugin.
      */
-    public static function _delete_submission_for_context(submission_request_data $requestdata) {
-        global $DB;
-        \core_plagiarism\privacy\provider::delete_plagiarism_for_context($requestdata->get_context());
+    public static function _delete_feedback_for_context(feedback_request_data $requestdata) {
+        $plugin = $requestdata->get_subplugin();
+        $fileareas = $plugin->get_file_areas();
         $fs = get_file_storage();
-        $fs->delete_area_files($requestdata->get_context()->id, ASSIGNSUBMISSION_ONLINEPOODLL_COMPONENT, ASSIGNSUBMISSION_ONLINEPOODLL_FILEAREA);
-        // Delete records from assignsubmission_file table. -- Could use the assignment id.....
-        $DB->delete_records(ASSIGNSUBMISSION_ONLINEPOODLL_TABLE, ['assignment' => $requestdata->get_assign()->get_instance()->id]);
+        foreach ($fileareas as $filearea => $notused) {
+            // Delete feedback files.
+            $fs->delete_area_files($requestdata->get_context()->id, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea);
+        }
+        $plugin->delete_instance();
     }
+
     /**
-     * A call to this method should delete user data (where practicle) using the userid and submission.
+     * Calling this function should delete all user data associated with this grade.
      *
-     * @param  submission_request_data $exportdata Details about the user and context to focus the deletion.
+     * @param  feedback_request_data $requestdata Data useful for deleting user data.
      */
-    public static function _delete_submission_for_userid(submission_request_data $exportdata) {
+    public static function _delete_feedback_for_grade(feedback_request_data $requestdata) {
         global $DB;
-        \core_plagiarism\privacy\provider::delete_plagiarism_for_user($exportdata->get_user()->id, $exportdata->get_context());
-        $submissionid = $exportdata->get_submission()->id;
+        $plugin = $requestdata->get_subplugin();
+        $fileareas = $plugin->get_file_areas();
         $fs = get_file_storage();
-        $fs->delete_area_files($exportdata->get_context()->id, ASSIGNSUBMISSION_ONLINEPOODLL_COMPONENT, ASSIGNSUBMISSION_ONLINEPOODLL_FILEAREA,
-            $submissionid);
-        $DB->delete_records(ASSIGNSUBMISSION_ONLINEPOODLL_TABLE, ['assignment' => $exportdata->get_assign()->get_instance()->id,
-            'submission' => $submissionid]);
+        foreach ($fileareas as $filearea => $notused) {
+            // Delete feedback files.
+            $fs->delete_area_files($requestdata->get_context()->id, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea,
+                $requestdata->get_grade()->id);
+        }
+        // Delete table entries.
+        $DB->delete_records(ASSIGNFEEDBACK_POODLL_TABLE, ['assignment' => $requestdata->get_assign()->get_instance()->id,
+            'grade' => $requestdata->get_grade()->id]);
     }
 
 

@@ -32,6 +32,8 @@ if(!defined('FP_REPLYMP3VOICE')){
 	 */
 	define('ASSIGNFEEDBACK_POODLL_FILEAREA', 'poodll_files');
 	define('ASSIGNFEEDBACK_POODLL_COMPONENT', 'assignfeedback_poodll');
+    define('ASSIGNFEEDBACK_POODLL_TABLE', 'assignfeedback_poodll');
+
 
 	//some constants for poodll feedback
 	define('FP_REPLYMP3VOICE',0);

@@ -40,9 +40,14 @@ use \mod_assign\privacy\feedback_request_data;
  * @copyright  2018 Justin Hunt https://poodll.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadataprovider, \mod_assign\privacy\assignfeedback_provider {
+
+///class provider implements metadataprovider, \mod_assign\privacy\assignfeedback_provider {
+///    use \core_privacy\local\legacy_polyfill;
+///    use \mod_assign\privacy\assignfeedback_provider\legacy_polyfill;
+
+
+class provider implements metadataprovider {
     use \core_privacy\local\legacy_polyfill;
-    use \mod_assign\privacy\assignfeedback_provider\legacy_polyfill;
 
 
     /**

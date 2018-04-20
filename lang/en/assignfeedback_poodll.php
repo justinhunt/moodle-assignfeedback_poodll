@@ -47,3 +47,4 @@ $string['deletefeedback'] = 'Delete this feedback.';
 $string['reallydeletefeedback'] = 'Really delete this feedback?';
 
 $string['poodll:use'] = 'Allow use of Poodll for feedback';
+$string['privacy:metadata'] = 'The Poodll Online Assignment Submission plugin does store personal data.';

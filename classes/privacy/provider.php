@@ -84,7 +84,7 @@ class provider implements metadataprovider, assignfeedback_provider {
     public static function get_student_user_ids(useridlist $useridlist) {
         // No need.
     }
-    
+
     /**
      * Export all user data for this plugin.
      *
@@ -97,7 +97,7 @@ class provider implements metadataprovider, assignfeedback_provider {
         $assign = $exportdata->get_assign();
         $plugin = $assign->get_plugin_by_type('assignfeedback', 'poodll');
         $gradeid = $exportdata->get_pluginobject()->id;
-        $filefeedback = $plugin->get_file_feedback($gradeid);
+        $filefeedback = $plugin->get_feedback_poodll($gradeid);
         if ($filefeedback) {
             $fileareas = $plugin->get_file_areas();
             foreach ($fileareas as $filearea => $notused) {

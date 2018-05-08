@@ -31,8 +31,11 @@ require_once($CFG->dirroot . '/mod/assign/feedback/poodll/locallib.php');
 
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\metadata\provider as metadataprovider;
+use core_privacy\local\request\contextlist;
 use \mod_assign\privacy\assignfeedback_provider;
-use \mod_assign\privacy\feedback_request_data;
+use \mod_assign\privacy\assign_plugin_request_data;
+use mod_assign\privacy\useridlist;
+
 
 /**
  * Privacy Subsystem for assignfeedback_poodll implementing null_provider.
@@ -46,7 +49,7 @@ use \mod_assign\privacy\feedback_request_data;
 ///    use \mod_assign\privacy\assignfeedback_provider\legacy_polyfill;
 
 
-class provider implements metadataprovider {
+class provider implements metadataprovider, assignfeedback_provider {
     use \core_privacy\local\legacy_polyfill;
 
 
@@ -60,39 +63,43 @@ class provider implements metadataprovider {
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
         return $collection;
     }
+
     /**
-    * No need to fill in this method as all information can be acquired from the assign_grades table in the mod assign
+     * No need to fill in this method as all information can be acquired from the assign_grades table in the mod assign
      * provider.
      *
-     * @param  int $userid The user ID that we are finding contexts for.
-     * @param  contextlist $contextlist A context list to add sql and params to for contexts.
+     * @param  int $userid The user ID.
+     * @param  contextlist $contextlist The context list.
      */
-    public static function _get_context_for_userid_within_feedback($userid, contextlist $contextlist) {
-        // This is already fetched from mod_assign.
+    public static function get_context_for_userid_within_feedback(int $userid, contextlist $contextlist) {
+        // This uses the assign_grade table.
     }
+
+
     /**
      * This is also covered by the mod_assign provider and it's queries.
      *
      * @param  \mod_assign\privacy\useridlist $useridlist An object for obtaining user IDs of students.
      */
-    public static function _get_student_user_ids(\mod_assign\privacy\useridlist $useridlist) {
+    public static function get_student_user_ids(useridlist $useridlist) {
         // No need.
     }
+    
     /**
      * Export all user data for this plugin.
      *
      * @param  feedback_request_data $exportdata Data used to determine which context and user to export and other useful
      * information to help with exporting.
      */
-    public static function _export_feedback_user_data(feedback_request_data $exportdata) {
+    public static function export_feedback_user_data(assign_plugin_request_data $exportdata) {
         $currentpath = $exportdata->get_subcontext();
         $currentpath[] = get_string('privacy:path', ASSIGNFEEDBACK_POODLL_COMPONENT);
-        $plugin = $exportdata->get_subplugin();
-        $gradeid = $exportdata->get_grade()->id;
+        $assign = $exportdata->get_assign();
+        $plugin = $assign->get_plugin_by_type('assignfeedback', 'poodll');
+        $gradeid = $exportdata->get_pluginobject()->id;
         $filefeedback = $plugin->get_file_feedback($gradeid);
         if ($filefeedback) {
             $fileareas = $plugin->get_file_areas();
-            $fs = get_file_storage();
             foreach ($fileareas as $filearea => $notused) {
                 \core_privacy\local\request\writer::with_context($exportdata->get_context())
                     ->export_area_files($currentpath, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea, $gradeid);
@@ -105,8 +112,10 @@ class provider implements metadataprovider {
      *
      * @param  feedback_request_data $requestdata Data useful for deleting user data from this sub-plugin.
      */
-    public static function _delete_feedback_for_context(feedback_request_data $requestdata) {
-        $plugin = $requestdata->get_subplugin();
+    public static function delete_feedback_for_context(assign_plugin_request_data $requestdata) {
+
+        $assign = $requestdata->get_assign();
+        $plugin = $assign->get_plugin_by_type('assignfeedback', 'poodll');
         $fileareas = $plugin->get_file_areas();
         $fs = get_file_storage();
         foreach ($fileareas as $filearea => $notused) {
@@ -121,19 +130,22 @@ class provider implements metadataprovider {
      *
      * @param  feedback_request_data $requestdata Data useful for deleting user data.
      */
-    public static function _delete_feedback_for_grade(feedback_request_data $requestdata) {
+    public static function delete_feedback_for_grade(assign_plugin_request_data $requestdata) {
         global $DB;
-        $plugin = $requestdata->get_subplugin();
+
+        $assign = $requestdata->get_assign();
+        $plugin = $assign->get_plugin_by_type('assignfeedback', 'poodll');
         $fileareas = $plugin->get_file_areas();
         $fs = get_file_storage();
         foreach ($fileareas as $filearea => $notused) {
             // Delete feedback files.
             $fs->delete_area_files($requestdata->get_context()->id, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea,
-                $requestdata->get_grade()->id);
+                $requestdata->get_pluginobject()->id);
         }
+
         // Delete table entries.
-        $DB->delete_records(ASSIGNFEEDBACK_POODLL_TABLE, ['assignment' => $requestdata->get_assign()->get_instance()->id,
-            'grade' => $requestdata->get_grade()->id]);
+        $DB->delete_records('assignfeedback_file', ['assignment' => $requestdata->get_assign()->get_instance()->id,
+            'grade' => $requestdata->get_pluginobject()->id]);
     }
 
 

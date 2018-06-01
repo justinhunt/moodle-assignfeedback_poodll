@@ -353,8 +353,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 				break;
 			
 			case FP_REPLYSNAPSHOT:
-				$mediadata= \filter_poodll\poodlltools::fetchSnapshotCameraforSubmission(FP_FILENAMECONTROL,
-						"snap.jpg" ,350,400,$usercontextid ,'user','draft',$draftitemid);
+                $mediadata= \filter_poodll\poodlltools::fetchHTML5SnapshotCamera(FP_FILENAMECONTROL,290,340,$usercontextid,'user','draft',$draftitemid,false);
 				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 

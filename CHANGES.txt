@@ -1,5 +1,8 @@
 Change List
 =========
+Version 3.1.02(Build 2018081700)
+-fixed bug that stopped local filter settings being applied to feedback for recorders
+
 Version 3.1.01(Build 2018060100)
 - Fixed bug in snapshot recorder
 

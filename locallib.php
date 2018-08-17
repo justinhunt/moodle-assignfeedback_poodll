@@ -330,6 +330,11 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 
         //get saved values and return them as defaults
         $recordertype = $this->get_config('recordertype');
+
+        //set up current module context id so we can fetch local filter based recorder
+        $hints = Array();
+        $hints['modulecontextid']=$contextid;
+        $callbackjs =false;
 		
 		//fetch the required "recorder
 		switch($recordertype){
@@ -359,14 +364,14 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 
 			case FP_REPLYVIDEO:
 				$mediadata= \filter_poodll\poodlltools::fetchVideoRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL,
-						$usercontextid ,'user','draft',$draftitemid,$timelimit);
+						$usercontextid ,'user','draft',$draftitemid,$timelimit,$callbackjs,$hints);
 				$mform->addElement('static', 'description',$displayname,$mediadata);			
 									
 				break;
 
             case FP_REPLYVOICE:
             case FP_REPLYMP3VOICE:
-                $mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit);
+                $mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit, $callbackjs, $hints);
                 $mform->addElement('static', 'description',$displayname,$mediadata);
                 break;
 					

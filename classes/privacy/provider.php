@@ -34,7 +34,8 @@ use \core_privacy\local\metadata\provider as metadataprovider;
 use core_privacy\local\request\contextlist;
 use \mod_assign\privacy\assignfeedback_provider;
 use \mod_assign\privacy\assign_plugin_request_data;
-use mod_assign\privacy\useridlist;
+use \mod_assign\privacy\useridlist;
+use \mod_assign\privacy\assignfeedback_user_provider;
 use assignfeedback_poodll\constants;
 
 
@@ -45,12 +46,10 @@ use assignfeedback_poodll\constants;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-///class provider implements metadataprovider, \mod_assign\privacy\assignfeedback_provider {
-///    use \core_privacy\local\legacy_polyfill;
-///    use \mod_assign\privacy\assignfeedback_provider\legacy_polyfill;
+class provider implements metadataprovider,
+    assignfeedback_provider,
+    assignfeedback_user_provider {
 
-
-class provider implements metadataprovider, assignfeedback_provider {
     use \core_privacy\local\legacy_polyfill;
     use \mod_assign\privacy\feedback_legacy_polyfill;
 
@@ -61,7 +60,7 @@ class provider implements metadataprovider, assignfeedback_provider {
      * @param  collection $collection A list of information to add to.
      * @return collection Return the collection after adding to it.
      */
-    public static function _get_metadata(collection $collection) {
+    public static function _get_metadata($collection) {
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
         return $collection;
     }
@@ -73,7 +72,7 @@ class provider implements metadataprovider, assignfeedback_provider {
      * @param  int $userid The user ID.
      * @param  contextlist $contextlist The context list.
      */
-    public static function get_context_for_userid_within_feedback($userid, contextlist $contextlist) {
+    public static function _get_context_for_userid_within_feedback($userid, $contextlist) {
         // This uses the assign_grade table.
     }
 
@@ -83,9 +82,20 @@ class provider implements metadataprovider, assignfeedback_provider {
      *
      * @param  \mod_assign\privacy\useridlist $useridlist An object for obtaining user IDs of students.
      */
-    public static function get_student_user_ids(useridlist $useridlist) {
+    public static function _get_student_user_ids($useridlist) {
         // No need.
     }
+
+    /**
+     * If you have tables that contain userids and you can generate entries in your tables without creating an
+     * entry in the assign_grades table then please fill in this method.
+     *
+     * @param  \core_privacy\local\request\userlist $userlist The userlist object
+     */
+    public static function _get_userids_from_context($userlist) {
+        // Not required.
+    }
+
 
     /**
      * Export all user data for this plugin.
@@ -93,7 +103,7 @@ class provider implements metadataprovider, assignfeedback_provider {
      * @param  feedback_request_data $exportdata Data used to determine which context and user to export and other useful
      * information to help with exporting.
      */
-    public static function export_feedback_user_data(assign_plugin_request_data $exportdata) {
+    public static function _export_feedback_user_data($exportdata) {
         $currentpath = $exportdata->get_subcontext();
         $currentpath[] = get_string('privacy:path', constants::M_COMPONENT);
         $assign = $exportdata->get_assign();
@@ -114,7 +124,7 @@ class provider implements metadataprovider, assignfeedback_provider {
      *
      * @param  feedback_request_data $requestdata Data useful for deleting user data from this sub-plugin.
      */
-    public static function delete_feedback_for_context(assign_plugin_request_data $requestdata) {
+    public static function _delete_feedback_for_context($requestdata) {
 
         $assign = $requestdata->get_assign();
         $plugin = $assign->get_plugin_by_type('assignfeedback', constants::M_SUBPLUGIN);
@@ -132,7 +142,7 @@ class provider implements metadataprovider, assignfeedback_provider {
      *
      * @param  feedback_request_data $requestdata Data useful for deleting user data.
      */
-    public static function delete_feedback_for_grade(assign_plugin_request_data $requestdata) {
+    public static function _delete_feedback_for_grade($requestdata) {
         global $DB;
 
         $assign = $requestdata->get_assign();
@@ -150,5 +160,34 @@ class provider implements metadataprovider, assignfeedback_provider {
             'grade' => $requestdata->get_pluginobject()->id]);
     }
 
+    /**
+     * Deletes all feedback for the grade ids / userids provided in a context.
+     * assign_plugin_request_data contains:
+     * - context
+     * - assign object
+     * - grade ids (pluginids)
+     * - user ids
+     * @param  assign_plugin_request_data $deletedata A class that contains the relevant information required for deletion.
+     */
+    public static function _delete_feedback_for_grades($deletedata) {
+        global $DB;
 
+        if (empty($deletedata->get_gradeids())) {
+            return;
+        }
+
+        $assign = $deletedata->get_assign();
+        $plugin = $assign->get_plugin_by_type('assignfeedback', constants::M_SUBPLUGIN);
+        $fileareas = $plugin->get_file_areas();
+        $fs = get_file_storage();
+        list($sql, $params) = $DB->get_in_or_equal($deletedata->get_gradeids(), SQL_PARAMS_NAMED);
+        $params['assignment'] = $deletedata->get_assignid();
+        foreach ($fileareas as $filearea => $notused) {
+            // Delete feedback files.
+            $fs->delete_area_files_select($deletedata->get_context()->id, constants::M_COMPONENT, $filearea, $sql, $params);
+        }
+
+        // Delete table entries.
+        $DB->delete_records_select(constants::M_TABLE, "assignment = :assignment AND grade $sql", $params);
+    }
 }

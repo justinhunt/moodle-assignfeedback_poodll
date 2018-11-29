@@ -45,10 +45,13 @@ use assignfeedback_poodll\constants;
  * @copyright  2018 Justin Hunt https://poodll.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class provider implements metadataprovider,
-    assignfeedback_provider,
-    assignfeedback_user_provider {
+    assignfeedback_provider //, assignfeedback_user_provider
+ {
+
+    //TO DO: because 3.3 does not have a \mod_assign\privacy\assignfeedback_user_provider
+    //we would need to maintain different branches per Moodle version. One codebase can not do 3.3 - 3.6. here.
+    // So its commented above
 
     use \core_privacy\local\legacy_polyfill;
     use \mod_assign\privacy\feedback_legacy_polyfill;

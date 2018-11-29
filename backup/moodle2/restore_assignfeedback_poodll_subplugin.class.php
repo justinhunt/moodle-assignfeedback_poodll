@@ -23,6 +23,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use assignfeedback_poodll\constants;
+
 /**
  * restore subplugin class that provides the necessary information needed to restore one assign_feedback subplugin.
  *
@@ -60,9 +62,9 @@ class restore_assignfeedback_poodll_subplugin extends restore_subplugin {
         // the mapping is set in the restore for the core assign activity. When a grade node is processed
         $data->grade = $this->get_mappingid('grade', $data->grade);
 
-        $DB->insert_record('assignfeedback_poodll', $data);
+        $DB->insert_record(constants::M_TABLE, $data);
 
-        $this->add_related_files('assignfeedback_poodll', 'poodll_files', 'grade', null, $oldgradeid);
+        $this->add_related_files(constants::M_COMPONENT, constants::M_FILEAREA, 'grade', null, $oldgradeid);
     }
 
 }

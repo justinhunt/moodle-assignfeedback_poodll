@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use assignfeedback_poodll\constants;
 
 /**
  * Code run after the assignfeedback_poodll module database tables have been created.
@@ -41,7 +42,7 @@ function xmldb_assignfeedback_poodll_install() {
     // set the correct initial order for the plugins
     $pluginmanager = new assign_plugin_manager('assignfeedback');
 
-    $pluginmanager->move_plugin('poodll', 'down');
+    $pluginmanager->move_plugin(constants::M_SUBPLUGIN, 'down');
 
     // do the upgrades
     return true;

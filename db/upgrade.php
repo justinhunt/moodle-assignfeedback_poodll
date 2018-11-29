@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use assignfeedback_poodll\constants;
+
 /**
  * Stub for upgrade code
  * @param int $oldversion
@@ -32,20 +34,20 @@ function xmldb_assignfeedback_poodll_upgrade($oldversion) {
     // do the upgrades
 	//add filename field
     if ($oldversion < 2013120500) {
-    	$table = new xmldb_table('assignfeedback_poodll');	
+    	$table = new xmldb_table(constants::M_TABLE);
 		$table->add_field('filename', XMLDB_TYPE_TEXT, 'small', null,
                 null, null, null);
 
 		
 		 // online PoodLL savepoint reached
-        upgrade_plugin_savepoint(true, 2013120500, 'assignfeedback', 'poodll');
+        upgrade_plugin_savepoint(true, 2013120500, 'assignfeedback', constants::M_SUBPLUGIN);
     
     }
     //set all audio red5 to new audio  recorder type
     if ($oldversion < 2017052201) {
-        $DB->set_field('assignfeedback_poodll','poodlltype',0,array('poodlltype'=>1));
+        $DB->set_field(constants::M_TABLE,'poodlltype',0,array('poodlltype'=>1));
         // online PoodLL savepoint reached
-        upgrade_plugin_savepoint(true, 2017052201, 'assignfeedback', 'poodll');
+        upgrade_plugin_savepoint(true, 2017052201, 'assignfeedback', constants::M_SUBPLUGIN);
     }
 
 

@@ -23,6 +23,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use assignfeedback_poodll\constants;
+
+
 /**
  * Serves assignment feedback and other files.
  *
@@ -63,7 +66,7 @@ function assignfeedback_poodll_pluginfile($course, $cm, context $context, $filea
 
     $relativepath = implode('/', $args);
 
-    $fullpath = "/{$context->id}/assignfeedback_poodll/$filearea/$itemid/$relativepath";
+    $fullpath = "/{$context->id}/" . constants::M_COMPONENT . "/$filearea/$itemid/$relativepath";
 
     $fs = get_file_storage();
     if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {

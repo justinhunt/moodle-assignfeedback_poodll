@@ -15,22 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capability definitions for this module.
+ *
  *
  * @package   assignfeedback_poodll
- * @copyright 2018 Justin Hunt {@link https://poodll.com}
+ * @copyright 2018 Justin Hunt {@link http://www.poodll.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use assignfeedback_poodll\constants;
-
-$capabilities = array('assignfeedback/'. constants::M_SUBPLUGIN .':use' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW
-        ),
-    ),
-);
 
 
+namespace assignfeedback_poodll;
+
+defined('MOODLE_INTERNAL') || die();
+
+class constants
+{
+
+const M_FILEAREA = 'poodll_files';
+const M_COMPONENT='assignfeedback_poodll';
+const M_TABLE='assignfeedback_poodll';
+const M_SUBPLUGIN='poodll';
+
+const M_REPLYMP3VOICE=0;
+const M_REPLYVOICE=1;
+const M_REPLYVIDEO=2;
+const M_REPLYWHITEBOARD=3;
+const M_REPLYSNAPSHOT=4;
+const M_FILENAMECONTROL='poodllfeedback';
+}

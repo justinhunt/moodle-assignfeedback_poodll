@@ -35,6 +35,7 @@ use core_privacy\local\request\contextlist;
 use \mod_assign\privacy\assignfeedback_provider;
 use \mod_assign\privacy\assign_plugin_request_data;
 use mod_assign\privacy\useridlist;
+use assignfeedback_poodll\constants;
 
 
 /**
@@ -51,6 +52,7 @@ use mod_assign\privacy\useridlist;
 
 class provider implements metadataprovider, assignfeedback_provider {
     use \core_privacy\local\legacy_polyfill;
+    use \mod_assign\privacy\feedback_legacy_polyfill;
 
 
     /**
@@ -71,7 +73,7 @@ class provider implements metadataprovider, assignfeedback_provider {
      * @param  int $userid The user ID.
      * @param  contextlist $contextlist The context list.
      */
-    public static function get_context_for_userid_within_feedback(int $userid, contextlist $contextlist) {
+    public static function get_context_for_userid_within_feedback($userid, contextlist $contextlist) {
         // This uses the assign_grade table.
     }
 
@@ -93,16 +95,16 @@ class provider implements metadataprovider, assignfeedback_provider {
      */
     public static function export_feedback_user_data(assign_plugin_request_data $exportdata) {
         $currentpath = $exportdata->get_subcontext();
-        $currentpath[] = get_string('privacy:path', ASSIGNFEEDBACK_POODLL_COMPONENT);
+        $currentpath[] = get_string('privacy:path', constants::M_COMPONENT);
         $assign = $exportdata->get_assign();
-        $plugin = $assign->get_plugin_by_type('assignfeedback', 'poodll');
+        $plugin = $assign->get_plugin_by_type('assignfeedback', constants::M_SUBPLUGIN);
         $gradeid = $exportdata->get_pluginobject()->id;
         $filefeedback = $plugin->get_feedback_poodll($gradeid);
         if ($filefeedback) {
             $fileareas = $plugin->get_file_areas();
             foreach ($fileareas as $filearea => $notused) {
                 \core_privacy\local\request\writer::with_context($exportdata->get_context())
-                    ->export_area_files($currentpath, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea, $gradeid);
+                    ->export_area_files($currentpath, constants::M_COMPONENT, $filearea, $gradeid);
             }
         }
     }
@@ -115,12 +117,12 @@ class provider implements metadataprovider, assignfeedback_provider {
     public static function delete_feedback_for_context(assign_plugin_request_data $requestdata) {
 
         $assign = $requestdata->get_assign();
-        $plugin = $assign->get_plugin_by_type('assignfeedback', 'poodll');
+        $plugin = $assign->get_plugin_by_type('assignfeedback', constants::M_SUBPLUGIN);
         $fileareas = $plugin->get_file_areas();
         $fs = get_file_storage();
         foreach ($fileareas as $filearea => $notused) {
             // Delete feedback files.
-            $fs->delete_area_files($requestdata->get_context()->id, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea);
+            $fs->delete_area_files($requestdata->get_context()->id, constants::M_COMPONENT, $filearea);
         }
         $plugin->delete_instance();
     }
@@ -134,17 +136,17 @@ class provider implements metadataprovider, assignfeedback_provider {
         global $DB;
 
         $assign = $requestdata->get_assign();
-        $plugin = $assign->get_plugin_by_type('assignfeedback', 'poodll');
+        $plugin = $assign->get_plugin_by_type('assignfeedback', constants::M_SUBPLUGIN);
         $fileareas = $plugin->get_file_areas();
         $fs = get_file_storage();
         foreach ($fileareas as $filearea => $notused) {
             // Delete feedback files.
-            $fs->delete_area_files($requestdata->get_context()->id, ASSIGNFEEDBACK_POODLL_COMPONENT, $filearea,
+            $fs->delete_area_files($requestdata->get_context()->id, constants::M_COMPONENT, $filearea,
                 $requestdata->get_pluginobject()->id);
         }
 
         // Delete table entries.
-        $DB->delete_records('assignfeedback_file', ['assignment' => $requestdata->get_assign()->get_instance()->id,
+        $DB->delete_records(constants::M_TABLE, ['assignment' => $requestdata->get_assign()->get_instance()->id,
             'grade' => $requestdata->get_pluginobject()->id]);
     }
 

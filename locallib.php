@@ -25,24 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
-if(!defined('FP_REPLYMP3VOICE')){
- /**
- * File areas for PoodLL feedback
-	 */
-	define('ASSIGNFEEDBACK_POODLL_FILEAREA', 'poodll_files');
-	define('ASSIGNFEEDBACK_POODLL_COMPONENT', 'assignfeedback_poodll');
-    define('ASSIGNFEEDBACK_POODLL_TABLE', 'assignfeedback_poodll');
-
-
-	//some constants for poodll feedback
-	define('FP_REPLYMP3VOICE',0);
-	define('FP_REPLYVOICE',1);
-	define('FP_REPLYVIDEO',2);
-	define('FP_REPLYWHITEBOARD',3);
-	define('FP_REPLYSNAPSHOT',4);
-	define('FP_FILENAMECONTROL','poodllfeedback');
-}
+use assignfeedback_poodll\constants;
 
 /**
  * library class for PoodLL feedback plugin extending feedback plugin base class
@@ -62,7 +45,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 	      if ($this->get_config('enabled')) {
 	          return true;
 	      }
-	      if (!has_capability('assignfeedback/poodll:use', $context)) {
+	      if (!has_capability('assignfeedback/' . constants::M_SUBPLUGIN . ':use', $context)) {
 	          return false;
 	      }
 	      return parent::is_configurable();
@@ -73,7 +56,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
     * @return string
     */
     public function get_name() {
-        return get_string('pluginname', 'assignfeedback_poodll');
+        return get_string('pluginname', constants::M_COMPONENT);
     }
 
     /**
@@ -84,7 +67,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
      */
     public function get_feedback_poodll($gradeid) {
         global $DB;
-        return $DB->get_record('assignfeedback_poodll', array('grade'=>$gradeid));
+        return $DB->get_record(constants::M_TABLE, array('grade'=>$gradeid));
     }
     
     	    /**
@@ -102,43 +85,43 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         $recordertype = $this->get_config('recordertype');
 
         //convert old Red5 refs to audio media type option
-        if($recordertype==FP_REPLYVOICE){
-            $recordertype=FP_REPLYMP3VOICE;
+        if($recordertype==constants::M_REPLYVOICE){
+            $recordertype=constants::M_REPLYMP3VOICE;
         }
 		$boardsize = $this->get_config('boardsize');
 		$downloadsok = $this->get_config('downloadsok');
 		
 		//get allowed recorders from admin settings
-		$allowed_recorders = get_config('assignfeedback_poodll', 'allowedrecorders');
+		$allowed_recorders = get_config(constants::M_COMPONENT, 'allowedrecorders');
 		$allowed_recorders  = explode(',',$allowed_recorders);
 		$recorderoptions = array();
-		if(array_search(FP_REPLYMP3VOICE,$allowed_recorders)!==false || array_search(FP_REPLYVOICE,$allowed_recorders)!==false){
-			$recorderoptions[FP_REPLYMP3VOICE] = get_string("replymp3voice", "assignfeedback_poodll");
+		if(array_search(constants::M_REPLYMP3VOICE,$allowed_recorders)!==false || array_search(constants::M_REPLYVOICE,$allowed_recorders)!==false){
+			$recorderoptions[constants::M_REPLYMP3VOICE] = get_string("replymp3voice", constants::M_COMPONENT);
 		}
-		if(array_search(FP_REPLYVIDEO ,$allowed_recorders)!==false){
-			$recorderoptions[FP_REPLYVIDEO ] = get_string("replyvideo", "assignfeedback_poodll");
+		if(array_search(constants::M_REPLYVIDEO ,$allowed_recorders)!==false){
+			$recorderoptions[constants::M_REPLYVIDEO ] = get_string("replyvideo", constants::M_COMPONENT);
 		}
-		if(array_search(FP_REPLYWHITEBOARD,$allowed_recorders)!==false){
-			$recorderoptions[FP_REPLYWHITEBOARD ] = get_string("replywhiteboard", "assignfeedback_poodll");
+		if(array_search(constants::M_REPLYWHITEBOARD,$allowed_recorders)!==false){
+			$recorderoptions[constants::M_REPLYWHITEBOARD ] = get_string("replywhiteboard", constants::M_COMPONENT);
 		}
-		if(array_search(FP_REPLYSNAPSHOT,$allowed_recorders)!==false){
-			$recorderoptions[FP_REPLYSNAPSHOT] = get_string("replysnapshot", "assignfeedback_poodll");
+		if(array_search(constants::M_REPLYSNAPSHOT,$allowed_recorders)!==false){
+			$recorderoptions[constants::M_REPLYSNAPSHOT] = get_string("replysnapshot", constants::M_COMPONENT);
 		}
 		
 	
-	$mform->addElement('select', 'assignfeedback_poodll_recordertype', get_string("recordertype", "assignfeedback_poodll"), $recorderoptions);
-        //$mform->addHelpButton('assignfeedback_poodll_recordertype', get_string('onlinepoodll', ASSIGNSUBMISSION_ONLINEPOODLL_COMPONENT), ASSIGNSUBMISSION_ONLINEPOODLL_COMPONENT);
-    $mform->setDefault('assignfeedback_poodll_recordertype', $recordertype);
-	$mform->disabledIf('assignfeedback_poodll_recordertype', 'assignfeedback_poodll_enabled', 'eq', 0);
+	$mform->addElement('select', constants::M_COMPONENT . '_recordertype', get_string("recordertype", constants::M_COMPONENT), $recorderoptions);
+        //$mform->addHelpButton(constants::M_COMPONENT . '_recordertype', get_string('onlinepoodll', ASSIGNSUBMISSION_ONLINEPOODLL_COMPONENT), ASSIGNSUBMISSION_ONLINEPOODLL_COMPONENT);
+    $mform->setDefault(constants::M_COMPONENT . '_recordertype', $recordertype);
+	$mform->disabledIf(constants::M_COMPONENT . '_recordertype', constants::M_COMPONENT . '_enabled', 'notchecked');
 	
 	//Are students and teachers shown the download link for the feedback recording
-	$yesno_options = array( 1 => get_string("yes", "assignfeedback_poodll"), 
-				0 => get_string("no", "assignfeedback_poodll"));
-	$mform->addElement('select', 'assignfeedback_poodll_downloadsok', get_string('downloadsok', 'assignfeedback_poodll'), $yesno_options);
-	$mform->setDefault('assignfeedback_poodll_downloadsok', $downloadsok);
+	$yesno_options = array( 1 => get_string("yes", constants::M_COMPONENT),
+				0 => get_string("no", constants::M_COMPONENT));
+	$mform->addElement('select', constants::M_COMPONENT . '_downloadsok', get_string('downloadsok', constants::M_COMPONENT), $yesno_options);
+	$mform->setDefault(constants::M_COMPONENT . '_downloadsok', $downloadsok);
 		
 	//If whiteboard not allowed, not much point showing boardsizes
-		if(array_search(FP_REPLYWHITEBOARD,$allowed_recorders)!==false){
+		if(array_search(constants::M_REPLYWHITEBOARD,$allowed_recorders)!==false){
 				//board sizes for the whiteboard feedback
 				$boardsizes = array(
 						'320x320' => '320x320',
@@ -148,11 +131,11 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 						'600x800' => '600x800',
 						'800x600' => '800x600'
 						);
-				$mform->addElement('select', 'assignfeedback_poodll_boardsize',
-						get_string('boardsize', 'assignfeedback_poodll'), $boardsizes);
-				$mform->setDefault('assignfeedback_poodll_boardsize', $boardsize);
-				$mform->disabledIf('assignfeedback_poodll_boardsize', 'assignfeedback_poodll_enabled', 'eq', 0);
-					$mform->disabledIf('assignfeedback_poodll_boardsize', 'assignfeedback_poodll_recordertype', 'ne', FP_REPLYWHITEBOARD );
+				$mform->addElement('select', constants::M_COMPONENT . '_boardsize',
+						get_string('boardsize', constants::M_COMPONENT), $boardsizes);
+				$mform->setDefault(constants::M_COMPONENT . '_boardsize', $boardsize);
+				$mform->disabledIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_enabled', 'eq', 0);
+					$mform->disabledIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_recordertype', 'ne', constants::M_REPLYWHITEBOARD );
 		}//end of if whiteboard
 		
     }//end of function
@@ -166,12 +149,12 @@ class assign_feedback_poodll extends assign_feedback_plugin {
      */
     public function save_settings(stdClass $data) {
 
-        $this->set_config('recordertype', $data->assignfeedback_poodll_recordertype);
-		$this->set_config('downloadsok', $data->assignfeedback_poodll_downloadsok);
+        $this->set_config('recordertype', $data->{constants::M_COMPONENT . '_recordertype'});
+		$this->set_config('downloadsok', $data->{constants::M_COMPONENT . '_downloadsok'});
 		
 		//if we have a board size, set it
-		if(isset($data->assignfeedback_poodll_boardsize)){
-			$this->set_config('boardsize', $data->assignfeedback_poodll_boardsize);
+		if(isset($data->{constants::M_COMPONENT . '_boardsize'})){
+			$this->set_config('boardsize', $data->{constants::M_COMPONENT . '_boardsize'});
 		}else{
 			$this->set_config('boardsize', '320x320');
 		}
@@ -183,12 +166,12 @@ class assign_feedback_poodll extends assign_feedback_plugin {
     function shift_draft_file($grade, $data) {
         global $CFG, $USER, $DB,$COURSE;	
  
-	//When we add the recorder via the poodll filter, it adds a hidden form field of the name FP_FILENAMECONTROL
+	//When we add the recorder via the poodll filter, it adds a hidden form field of the name constants::M_FILENAMECONTROL
 	//the recorder updates that field with the filename of the audio/video it recorded. We pick up that filename here.
 	$filename ='';     
 	$draftitemid = 	0;
-	if(property_exists($data,FP_FILENAMECONTROL) && !empty($data->{FP_FILENAMECONTROL})){
-		$filename = $data->{FP_FILENAMECONTROL};
+	if(property_exists($data,constants::M_FILENAMECONTROL) && !empty($data->{constants::M_FILENAMECONTROL})){
+		$filename = $data->{constants::M_FILENAMECONTROL};
 		$draftitemid = $data->draftitemid;
 	}
 	
@@ -205,7 +188,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
          
          $fs = get_file_storage();
          $browser = get_file_browser();
-         $fs->delete_area_files($this->assignment->get_context()->id, ASSIGNFEEDBACK_POODLL_COMPONENT,ASSIGNFEEDBACK_POODLL_FILEAREA , $grade->id);
+         $fs->delete_area_files($this->assignment->get_context()->id, constants::M_COMPONENT,constants::M_FILEAREA , $grade->id);
 		
 		
 		//if filename = -1 we are being told to delete the file
@@ -224,8 +207,8 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 			$file_record = array(
 			'userid' => $USER->id,
 			'contextid'=>$this->assignment->get_context()->id, 
-			'component'=>ASSIGNFEEDBACK_POODLL_COMPONENT, 
-			'filearea'=>ASSIGNFEEDBACK_POODLL_FILEAREA,
+			'component'=>constants::M_COMPONENT,
+			'filearea'=>constants::M_FILEAREA,
 			'itemid'=>$grade->id, 
 			'filepath'=>'/', 
 			'filename'=>$filename,
@@ -256,7 +239,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
      * @return array - An array of fileareas (keys) and descriptions (values)
      */
     public function get_file_areas() {
-        return array(ASSIGNFEEDBACK_POODLL_FILEAREA=>$this->get_name());
+        return array(constants::M_FILEAREA=>$this->get_name());
     }
 
 	/**
@@ -288,12 +271,12 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         $displayname = $this->get_name(); 
         $gradeid = $grade ? $grade->id : 0;
         
-        if ($gradeid > 0 && get_config('assignfeedback_poodll', 'showcurrentfeedback')) {
+        if ($gradeid > 0 && get_config(constants::M_COMPONENT, 'showcurrentfeedback')) {
            $currentfeedback = $this->fetch_responses($gradeid);
             if($currentfeedback != ''){
 				$deletefeedback = "<a href='javascript:void(0);' onclick='M.assignfeedback_poodll.deletefeedback();'>".
             						"<img src='" . $CFG->httpswwwroot . '/mod/assign/feedback/poodll/pix/deletebutton.png' . 
-									"' alt='" . get_string('deletefeedback','assignfeedback_poodll') . "'/>" . 
+									"' alt='" . get_string('deletefeedback',constants::M_COMPONENT) . "'/>" .
             						"</a>";
             	$currentfeedback .= $deletefeedback;
             }
@@ -305,8 +288,8 @@ class assign_feedback_poodll extends assign_feedback_plugin {
              $displayname="";
              
              $opts = array(
-				"filecontrolid"=> FP_FILENAMECONTROL,
-				"reallydeletefeedback"=> get_string('reallydeletefeedback','assignfeedback_poodll'),
+				"filecontrolid"=> constants::M_FILENAMECONTROL,
+				"reallydeletefeedback"=> get_string('reallydeletefeedback',constants::M_COMPONENT),
 				"currentcontainer"=> $currentcontainer
 			);
 			//$PAGE->requires->js(new moodle_url($CFG->httpswwwroot . '/mod/assign/feedback/poodll/module.js'));
@@ -315,15 +298,15 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 
 		//We prepare our form here and fetch/save data in SAVE method
 		$usercontextid=context_user::instance($USER->id)->id;
-		$draftitemid = file_get_submitted_draft_itemid(FP_FILENAMECONTROL);
+		$draftitemid = file_get_submitted_draft_itemid(constants::M_FILENAMECONTROL);
 		$contextid=$this->assignment->get_context()->id;
-		file_prepare_draft_area($draftitemid, $contextid, ASSIGNFEEDBACK_POODLL_COMPONENT, ASSIGNFEEDBACK_POODLL_FILEAREA, $gradeid, null,null);
+		file_prepare_draft_area($draftitemid, $contextid, constants::M_COMPONENT, constants::M_FILEAREA, $gradeid, null,null);
 		$mform->addElement('hidden', 'draftitemid', $draftitemid);
 		$mform->addElement('hidden', 'usercontextid', $usercontextid);	
-		$mform->addElement('hidden', FP_FILENAMECONTROL, '',array('id' => FP_FILENAMECONTROL));
+		$mform->addElement('hidden', constants::M_FILENAMECONTROL, '',array('id' => constants::M_FILENAMECONTROL));
 		$mform->setType('draftitemid', PARAM_INT);
 		$mform->setType('usercontextid', PARAM_INT); 
-		$mform->setType(FP_FILENAMECONTROL, PARAM_TEXT); 
+		$mform->setType(constants::M_FILENAMECONTROL, PARAM_TEXT);
 	
         //no timelimit on recordings
         $timelimit=0;
@@ -339,7 +322,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		//fetch the required "recorder
 		switch($recordertype){
 				
-			case FP_REPLYWHITEBOARD:
+			case constants::M_REPLYWHITEBOARD:
 				//get board sizes
 				switch($this->get_config('boardsize')){
 					case "320x320": $width=320;$height=320;break;
@@ -352,26 +335,26 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 
 				
 				$imageurl="";
-				$mediadata= \filter_poodll\poodlltools::fetchWhiteboardForSubmission(FP_FILENAMECONTROL,
+				$mediadata= \filter_poodll\poodlltools::fetchWhiteboardForSubmission(constants::M_FILENAMECONTROL,
 						$usercontextid ,'user','draft',$draftitemid, $width, $height, $imageurl);
 				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 			
-			case FP_REPLYSNAPSHOT:
-                $mediadata= \filter_poodll\poodlltools::fetchHTML5SnapshotCamera(FP_FILENAMECONTROL,290,340,$usercontextid,'user','draft',$draftitemid,false);
+			case constants::M_REPLYSNAPSHOT:
+                $mediadata= \filter_poodll\poodlltools::fetchHTML5SnapshotCamera(constants::M_FILENAMECONTROL,290,340,$usercontextid,'user','draft',$draftitemid,false);
 				$mform->addElement('static', 'description',$displayname,$mediadata);
 				break;
 
-			case FP_REPLYVIDEO:
-				$mediadata= \filter_poodll\poodlltools::fetchVideoRecorderForSubmission('swf','poodllfeedback',FP_FILENAMECONTROL,
+			case constants::M_REPLYVIDEO:
+				$mediadata= \filter_poodll\poodlltools::fetchVideoRecorderForSubmission('swf','poodllfeedback',constants::M_FILENAMECONTROL,
 						$usercontextid ,'user','draft',$draftitemid,$timelimit,$callbackjs,$hints);
 				$mform->addElement('static', 'description',$displayname,$mediadata);			
 									
 				break;
 
-            case FP_REPLYVOICE:
-            case FP_REPLYMP3VOICE:
-                $mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(FP_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit, $callbackjs, $hints);
+            case constants::M_REPLYVOICE:
+            case constants::M_REPLYMP3VOICE:
+                $mediadata= \filter_poodll\poodlltools::fetchMP3RecorderForSubmission(constants::M_FILENAMECONTROL, $usercontextid ,'user','draft',$draftitemid,$timelimit, $callbackjs, $hints);
                 $mform->addElement('static', 'description',$displayname,$mediadata);
                 break;
 					
@@ -396,7 +379,7 @@ class assign_feedback_poodll extends assign_feedback_plugin {
             }
         }
         */
-        if($data->{FP_FILENAMECONTROL}==$thefilename){
+        if($data->{constants::M_FILENAMECONTROL}==$thefilename){
             return false;
         }else{
             return true;
@@ -423,13 +406,13 @@ class assign_feedback_poodll extends assign_feedback_plugin {
         $feedbackpoodll = $this->get_feedback_poodll($grade->id);
         if ($feedbackpoodll) {
         	$feedbackpoodll->filename = $filename;
-            return $DB->update_record('assignfeedback_poodll', $feedbackpoodll);
+            return $DB->update_record(constants::M_TABLE, $feedbackpoodll);
         } else {
             $feedbackpoodll = new stdClass();
             $feedbackpoodll->grade = $grade->id;
             $feedbackpoodll->filename = $filename;
             $feedbackpoodll->assignment = $this->assignment->get_instance()->id;
-            return $DB->insert_record('assignfeedback_poodll', $feedbackpoodll) > 0;
+            return $DB->insert_record(constants::M_TABLE, $feedbackpoodll) > 0;
         }
     }
 
@@ -462,7 +445,7 @@ function fetch_responses($gradeid){
         $fs = get_file_storage();
         $filename="";
         $files = $fs->get_area_files($this->assignment->get_context()->id, 
-				ASSIGNFEEDBACK_POODLL_COMPONENT, ASSIGNFEEDBACK_POODLL_FILEAREA, $gradeid, "id", false);
+				constants::M_COMPONENT, constants::M_FILEAREA, $gradeid, "id", false);
         if (!empty($files)) {
 			//if the filename property exists, and is filled, use that to fetch the file
 			$poodllfeedback= $this->get_feedback_poodll($gradeid);
@@ -484,15 +467,15 @@ function fetch_responses($gradeid){
         }else{	
                 //The path to any media file we should play
                 $rawmediapath = $CFG->wwwroot.'/pluginfile.php/'.$this->assignment->get_context()->id 
-						. '/assignfeedback_poodll/' . ASSIGNFEEDBACK_POODLL_FILEAREA  . '/'.$gradeid.'/'.$filename;
+						. '/assignfeedback_poodll/' . constants::M_FILEAREA  . '/'.$gradeid.'/'.$filename;
                 $mediapath = urlencode($rawmediapath);
 
                 //prepare our response string, which will parsed and replaced with the necessary player
                 switch($this->get_config('recordertype')){
 
 
-                        case FP_REPLYVOICE:
-                        case FP_REPLYMP3VOICE:
+                        case constants::M_REPLYVOICE:
+                        case constants::M_REPLYMP3VOICE:
 	
 							$responsestring .= format_text("<a href=\"$rawmediapath\">$filename</a>", FORMAT_HTML);
 							if($this->get_config('downloadsok')){
@@ -503,15 +486,15 @@ function fetch_responses($gradeid){
 							
 							break;						
 
-                        case FP_REPLYVIDEO:
+                        case constants::M_REPLYVIDEO:
                             $responsestring .= format_text("<a href=\"$rawmediapath\">$filename</a>", FORMAT_HTML);
                             break;
 
-                        case FP_REPLYWHITEBOARD:
+                        case constants::M_REPLYWHITEBOARD:
                                 $responsestring .= "<img alt=\"submittedimage\" class=\"assignfeedback_poodll_whiteboardwidth\" src=\"" . $rawmediapath . "\" />";
                                 break;
 
-                        case FP_REPLYSNAPSHOT:
+                        case constants::M_REPLYSNAPSHOT:
                                 $responsestring .= "<img alt=\"submittedimage\" class=\"assignfeedback_poodll_snapshotwidth\" src=\"" . $rawmediapath . "\" />";
                                 break;
 
@@ -587,7 +570,7 @@ function fetch_responses($gradeid){
 
         $feedbackpoodll->grade = $grade->id;
         $feedbackpoodll->assignment = $this->assignment->get_instance()->id;
-        if (!$DB->insert_record('assignfeedback_poodll', $feedbackpoodll) > 0) {
+        if (!$DB->insert_record(constants::M_TABLE, $feedbackpoodll) > 0) {
             $log .= get_string('couldnotconvertgrade', 'mod_assign', $grade->userid);
             return false;
         }
@@ -603,7 +586,7 @@ function fetch_responses($gradeid){
     public function delete_instance() {
         global $DB;
         // will throw exception on failure
-        $DB->delete_records('assignfeedback_poodll', array('assignment'=>$this->assignment->get_instance()->id));
+        $DB->delete_records(constants::M_TABLE, array('assignment'=>$this->assignment->get_instance()->id));
         return true;
     }
 

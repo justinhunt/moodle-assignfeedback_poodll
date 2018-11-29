@@ -23,6 +23,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use assignfeedback_poodll\constants;
+
 /**
  * Provides the information to backup PoodLL feedback 
  *
@@ -50,9 +52,9 @@ class backup_assignfeedback_poodll_subplugin extends backup_subplugin {
         $subpluginwrapper->add_child($subpluginelement);
 
         // set source to populate the data
-        $subpluginelement->set_source_table('assignfeedback_poodll', array('grade' => backup::VAR_PARENTID));
+        $subpluginelement->set_source_table(constants::M_TABLE, array('grade' => backup::VAR_PARENTID));
 
-        $subpluginelement->annotate_files('assignfeedback_poodll', 'poodll_files', 'grade');// The parent is the grade
+        $subpluginelement->annotate_files(constants::M_COMPONENT, constants::M_FILEAREA, 'grade');// The parent is the grade
         return $subplugin;
     }
 

@@ -22,35 +22,28 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//some constants for poodll feedback
-if(!defined('FPS_REPLYMP3VOICE')){
-	define('FPS_REPLYMP3VOICE',0);
-	define('FPS_REPLYVOICE',1);
-	define('FPS_REPLYVIDEO',2);
-	define('FPS_REPLYWHITEBOARD',3);
-	define('FPS_REPLYSNAPSHOT',4);
-}
+use assignfeedback_poodll\constants;
 
 	//enable by default
-	$settings->add(new admin_setting_configcheckbox('assignfeedback_poodll/default',
-                   new lang_string('default', 'assignfeedback_poodll'),
-                   new lang_string('default_help', 'assignfeedback_poodll'), 1));
+	$settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . '/default',
+                   new lang_string('default', constants::M_COMPONENT),
+                   new lang_string('default_help', constants::M_COMPONENT), 1));
                    
 
 	//Recorders
-    $rec_options = array( FPS_REPLYMP3VOICE => get_string("replymp3voice", "assignfeedback_poodll"),
-				FPS_REPLYVIDEO => get_string("replyvideo", "assignfeedback_poodll"),
-				FPS_REPLYWHITEBOARD => get_string("replywhiteboard", "assignfeedback_poodll"),
-				FPS_REPLYSNAPSHOT => get_string("replysnapshot", "assignfeedback_poodll"));
-	$rec_defaults = array(FPS_REPLYMP3VOICE  => 1);
-	$settings->add(new admin_setting_configmulticheckbox('assignfeedback_poodll/allowedrecorders',
-						   get_string('allowedrecorders', 'assignfeedback_poodll'),
-						   get_string('allowedrecordersdetails', 'assignfeedback_poodll'), $rec_defaults,$rec_options));
+    $rec_options = array( constants::M_REPLYMP3VOICE => get_string("replymp3voice", constants::M_COMPONENT),
+				constants::M_REPLYVIDEO => get_string("replyvideo", constants::M_COMPONENT),
+				constants::M_REPLYWHITEBOARD => get_string("replywhiteboard", constants::M_COMPONENT),
+				constants::M_REPLYSNAPSHOT => get_string("replysnapshot", constants::M_COMPONENT));
+	$rec_defaults = array(constants::M_REPLYMP3VOICE  => 1);
+	$settings->add(new admin_setting_configmulticheckbox(constants::M_COMPONENT . '/allowedrecorders',
+						   get_string('allowedrecorders', constants::M_COMPONENT),
+						   get_string('allowedrecordersdetails', constants::M_COMPONENT), $rec_defaults,$rec_options));
 						   
 	//show current feedback on feedback form
-	$yesno_options = array( 0 => get_string("no", "assignfeedback_poodll"), 
-				1 => get_string("yes", "assignfeedback_poodll"));
-	$settings->add(new admin_setting_configselect('assignfeedback_poodll/showcurrentfeedback', 
-					new lang_string('showcurrentfeedback', 'assignfeedback_poodll'), 
-					new lang_string('showcurrentfeedbackdetails', 'assignfeedback_poodll'), 1, $yesno_options));
+	$yesno_options = array( 0 => get_string("no", constants::M_COMPONENT),
+				1 => get_string("yes", constants::M_COMPONENT));
+	$settings->add(new admin_setting_configselect(constants::M_COMPONENT . '/showcurrentfeedback',
+					new lang_string('showcurrentfeedback', constants::M_COMPONENT),
+					new lang_string('showcurrentfeedbackdetails', constants::M_COMPONENT), 1, $yesno_options));
 

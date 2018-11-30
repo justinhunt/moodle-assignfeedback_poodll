@@ -39,7 +39,7 @@ use assignfeedback_poodll\constants;
 
 
 //3.3 user_provider not backported so we use this switch to avoid errors when using same codebase for 3.3 and higher
-if (class_exists('\mod_assign\privacy\assignfeedback_user_provider')) {
+if (interface_exists('\mod_assign\privacy\assignfeedback_user_provider')) {
     interface the_user_provider extends \mod_assign\privacy\assignfeedback_user_provider{}
 } else {
     interface the_user_provider {};

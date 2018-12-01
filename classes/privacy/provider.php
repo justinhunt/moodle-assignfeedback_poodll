@@ -115,8 +115,8 @@ class provider implements metadataprovider,
         $assign = $exportdata->get_assign();
         $plugin = $assign->get_plugin_by_type('assignfeedback', constants::M_SUBPLUGIN);
         $gradeid = $exportdata->get_pluginobject()->id;
-        $filefeedback = $plugin->get_feedback_poodll($gradeid);
-        if ($filefeedback) {
+        $poodllfeedback = $plugin->get_feedback_poodll($gradeid);
+        if ($poodllfeedback) {
             $fileareas = $plugin->get_file_areas();
             foreach ($fileareas as $filearea => $notused) {
                 \core_privacy\local\request\writer::with_context($exportdata->get_context())

@@ -58,9 +58,10 @@ function assignfeedback_poodll_pluginfile($course, $cm, context $context, $filea
         return false;
     }
 
-
     // check is users feedback or has grading permission
-    if ($USER->id != $userid and !has_capability('mod/assign:grade', $context)) {
+    if ($USER->id != $userid &&
+            !has_capability('mod/assign:grade', $context) &&
+            !has_capability('assignfeedback/' . constants::M_SUBPLUGIN . ':reviewfeedbacks', $context)) {
         return false;
     }
 

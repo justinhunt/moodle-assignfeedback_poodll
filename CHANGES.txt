@@ -1,7 +1,10 @@
 Change List
 =========
+version 3.1.024(Build 2019062600)
+-Added reviewfeedback capability
+
 version 3.1.03(Build 2018113000)
--better intgegration of privacy api
+-better integration of privacy api
 
 Version 3.1.02(Build 2018081700)
 -fixed bug that stopped local filter settings being applied to feedback for recorders

@@ -47,6 +47,7 @@ $string['deletefeedback'] = 'Delete this feedback.';
 $string['reallydeletefeedback'] = 'Really delete this feedback?';
 
 $string['poodll:use'] = 'Allow use of Poodll for feedback';
+$string['poodll:reviewfeedbacks'] = 'Can review Poodll feedbacks(recordings)';
 $string['privacy:metadata'] = 'The Poodll Online Assignment Submission plugin does store personal data.';
 $string['privacy:path'] = 'feedback_poodll';
 $string['privacy:metadata:filepurpose'] = 'The recordings (Poodll file submissions) for this assignment feedback.';

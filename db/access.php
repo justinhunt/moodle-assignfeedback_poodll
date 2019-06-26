@@ -23,7 +23,8 @@
  */
 use assignfeedback_poodll\constants;
 
-$capabilities = array('assignfeedback/'. constants::M_SUBPLUGIN .':use' => array(
+$capabilities = array(
+        'assignfeedback/'. constants::M_SUBPLUGIN .':use' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
@@ -31,6 +32,16 @@ $capabilities = array('assignfeedback/'. constants::M_SUBPLUGIN .':use' => array
             'editingteacher' => CAP_ALLOW
         ),
     ),
+        'assignfeedback/'. constants::M_SUBPLUGIN .':reviewfeedbacks' => array(
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_COURSE,
+                'archetypes' => array(
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW
+                ),
+        )
+
 );
 
 

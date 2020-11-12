@@ -35,7 +35,7 @@ use assignfeedback_poodll\constants;
 				constants::M_REPLYVIDEO => get_string("replyvideo", constants::M_COMPONENT),
 				constants::M_REPLYWHITEBOARD => get_string("replywhiteboard", constants::M_COMPONENT),
 				constants::M_REPLYSNAPSHOT => get_string("replysnapshot", constants::M_COMPONENT));
-	$rec_defaults = array(constants::M_REPLYMP3VOICE  => 1);
+	$rec_defaults = array(constants::M_REPLYMP3VOICE  => 1,constants::M_REPLYVIDEO  => 1);
 	$settings->add(new admin_setting_configmulticheckbox(constants::M_COMPONENT . '/allowedrecorders',
 						   get_string('allowedrecorders', constants::M_COMPONENT),
 						   get_string('allowedrecordersdetails', constants::M_COMPONENT), $rec_defaults,$rec_options));

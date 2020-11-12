@@ -1,4 +1,4 @@
-PoodLL Feedback for Moodle 2.3 Assignments
+PoodLL Feedback for Moodle Assignment
 ========================================
 Thanks for downloading the PoodLL Feedback type. 
 Using this you to respond via video and audio recordings, and pictures to  assignment submissions.

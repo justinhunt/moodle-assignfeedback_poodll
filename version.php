@@ -23,9 +23,9 @@
  */
 
 
-$plugin->version   = 2019062600;
+$plugin->version   = 2020111200;
 $plugin->requires  = 2016052300;//moodle 3.1.0
 $plugin->component =  'assignfeedback_poodll';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.1.024(Build 2019062600)';
+$plugin->release   = '3.1.025(Build 2020112000)';
 $plugin->dependencies = array('filter_poodll' => 2018012001);

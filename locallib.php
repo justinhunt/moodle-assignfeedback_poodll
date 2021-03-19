@@ -119,8 +119,10 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 				0 => get_string("no", constants::M_COMPONENT));
 	$mform->addElement('select', constants::M_COMPONENT . '_downloadsok', get_string('downloadsok', constants::M_COMPONENT), $yesno_options);
 	$mform->setDefault(constants::M_COMPONENT . '_downloadsok', $downloadsok);
-		
-	//If whiteboard not allowed, not much point showing boardsizes
+    $mform->disabledIf(constants::M_COMPONENT . '_downloadsok', constants::M_COMPONENT . '_enabled', 'notchecked');
+
+
+        //If whiteboard not allowed, not much point showing boardsizes
 		if(array_search(constants::M_REPLYWHITEBOARD,$allowed_recorders)!==false){
 				//board sizes for the whiteboard feedback
 				$boardsizes = array(
@@ -135,9 +137,16 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 						get_string('boardsize', constants::M_COMPONENT), $boardsizes);
 				$mform->setDefault(constants::M_COMPONENT . '_boardsize', $boardsize);
 				$mform->disabledIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_enabled', 'eq', 0);
-					$mform->disabledIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_recordertype', 'ne', constants::M_REPLYWHITEBOARD );
+				$mform->disabledIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_recordertype', 'ne', constants::M_REPLYWHITEBOARD );
 		}//end of if whiteboard
-		
+
+        //If M3.4 or higher we can hide elements when we need to
+        if($CFG->version >= 2017111300) {
+            $mform->hideIf(constants::M_COMPONENT . '_recordertype', constants::M_COMPONENT . '_enabled', 'notchecked');
+            $mform->hideIf(constants::M_COMPONENT . '_downloadsok', constants::M_COMPONENT . '_enabled', 'notchecked');
+            $mform->hideIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_enabled', 'notchecked');
+        }
+
     }//end of function
     
     

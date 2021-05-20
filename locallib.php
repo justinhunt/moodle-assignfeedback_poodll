@@ -472,12 +472,11 @@ function fetch_responses($gradeid){
 	
         //if this is a playback area, for teacher, show a string if no file
         if (empty($filename)){ 
-                                $responsestring .= "";
+                 $responsestring .= "";
         }else{	
                 //The path to any media file we should play
                 $rawmediapath = $CFG->wwwroot.'/pluginfile.php/'.$this->assignment->get_context()->id 
 						. '/assignfeedback_poodll/' . constants::M_FILEAREA  . '/'.$gradeid.'/'.$filename;
-                $mediapath = urlencode($rawmediapath);
 
                 //prepare our response string, which will parsed and replaced with the necessary player
                 switch($this->get_config('recordertype')){
@@ -485,10 +484,10 @@ function fetch_responses($gradeid){
 
                         case constants::M_REPLYVOICE:
                         case constants::M_REPLYMP3VOICE:
-	
-							$responsestring .= format_text("<a href=\"$rawmediapath\">$filename</a>", FORMAT_HTML);
+
+                            $responsestring  = $this->fetch_feedback_player($rawmediapath);
 							if($this->get_config('downloadsok')){
-								$responsestring .= "<a href='" . $rawmediapath . "'>" 
+								$responsestring .= "<a href='" . $rawmediapath . "' class='nomediaplugin'>"
 										. get_string('downloadfile', 'assignfeedback_poodll') 
 										."</a>";
 							}
@@ -496,7 +495,8 @@ function fetch_responses($gradeid){
 							break;						
 
                         case constants::M_REPLYVIDEO:
-                            $responsestring .= format_text("<a href=\"$rawmediapath\">$filename</a>", FORMAT_HTML);
+
+                            $responsestring  = $this->fetch_feedback_player($rawmediapath);
                             break;
 
                         case constants::M_REPLYWHITEBOARD:
@@ -518,6 +518,41 @@ function fetch_responses($gradeid){
         return $responsestring;
 		
 }//end of fetch_responses
+
+
+    public function fetch_feedback_player($rawmediapath) {
+        global $OUTPUT;
+        // player template.
+        $randomid = html_writer::random_id('poodllfeedback_');
+        $playeropts=array(
+                'playerid'=> $randomid ,
+                'size'=>['width'=>480,'height'=>320],
+                'mediaurl'=>$rawmediapath . '?cachekiller=' . $randomid
+        );
+
+            // prepare our response string, which will parsed and replaced with the necessary player.
+            switch ($this->get_config('recordertype')) {
+
+                case constants::M_REPLYVOICE:
+                case constants::M_REPLYMP3VOICE:
+
+                    $playerstring = $OUTPUT->render_from_template(constants::M_COMPONENT . '/audioplayer', $playeropts);
+                    break;
+
+                case constants::M_REPLYVIDEO:
+
+                    $playerstring = $OUTPUT->render_from_template(constants::M_COMPONENT . '/videoplayer', $playeropts);
+                    break;
+
+
+                default:
+                    $playerstring = format_text("<a href='". $playeropts['mediaurl'] . "'>the_submission</a>", FORMAT_HTML);
+
+            }// end of switch.
+
+        return $playerstring;
+
+    }
 
 
     /**

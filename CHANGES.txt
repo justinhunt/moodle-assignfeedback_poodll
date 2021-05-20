@@ -1,5 +1,9 @@
 Change List
 =========
+version 3.1.027(Build 2021052000)
+-responsive players
+
+
 version 3.1.026(Build 2021031800)
 - added better hide/disble code for feedback options
 

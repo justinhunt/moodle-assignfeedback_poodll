@@ -18,6 +18,7 @@
  position: relative;
  height: 0;
  max-width: 480px;
+ min-width: 220px;
 }
 
 .assignfeedback_poodll_audio {
@@ -27,6 +28,7 @@
 .assignfeedback_poodll_audio_cont {
  width: 100%;
  max-width: 480px;
+ min-width: 220px;
 }
 
 @supports (padding-top: min(540px,150%)) {

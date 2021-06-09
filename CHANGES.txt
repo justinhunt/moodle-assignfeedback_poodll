@@ -1,5 +1,9 @@
 Change List
 =========
+version 3.1.028(Build 2021060900)
+- fix for responsive video sizing
+
+
 version 3.1.027(Build 2021052000)
 -responsive players
 

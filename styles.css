@@ -14,6 +14,13 @@
  height: 100%;
 }
 
+.assignfeedback_poodll_video_cont {
+ position: relative;
+ height: 0;
+ max-width: 480px;
+ min-width: 240px;
+}
+
 
 .assignfeedback_poodll_audio {
  width: 100%;
@@ -22,7 +29,7 @@
 
 @supports (padding-top: min(540px,150%)) {
 
- .assignfeedback_poodll_video_cont {
+.assignfeedback_poodll_video_cont {
   padding-bottom: min(360px,75%);
  }
 }

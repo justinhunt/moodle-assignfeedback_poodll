@@ -524,11 +524,18 @@ function fetch_responses($gradeid){
         global $OUTPUT;
         // player template.
         $randomid = html_writer::random_id('poodllfeedback_');
+
         $playeropts=array(
                 'playerid'=> $randomid ,
                 'size'=>['width'=>480,'height'=>320],
                 'mediaurl'=>$rawmediapath . '?cachekiller=' . $randomid
         );
+
+        // is this a list page?
+        $islist = optional_param('action', '', PARAM_TEXT) == 'grading';
+        if(!empty($islist)){
+            $playeropts['islist']=1;
+        }
 
             // prepare our response string, which will parsed and replaced with the necessary player.
             switch ($this->get_config('recordertype')) {

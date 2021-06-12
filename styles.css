@@ -24,6 +24,7 @@
 
 .assignfeedback_poodll_audio {
  width: 100%;
+ min-width: 240px;
 }
 
 

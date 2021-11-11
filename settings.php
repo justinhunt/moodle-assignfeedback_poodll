@@ -23,6 +23,7 @@
  */
 
 use assignfeedback_poodll\constants;
+use assignfeedback_poodll\utils;
 
 	//enable by default
 	$settings->add(new admin_setting_configcheckbox(constants::M_COMPONENT . '/default',
@@ -31,18 +32,14 @@ use assignfeedback_poodll\constants;
                    
 
 	//Recorders
-    $rec_options = array( constants::M_REPLYMP3VOICE => get_string("replymp3voice", constants::M_COMPONENT),
-				constants::M_REPLYVIDEO => get_string("replyvideo", constants::M_COMPONENT),
-				constants::M_REPLYWHITEBOARD => get_string("replywhiteboard", constants::M_COMPONENT),
-				constants::M_REPLYSNAPSHOT => get_string("replysnapshot", constants::M_COMPONENT));
+    $rec_options = utils::fetch_options_recorders();
 	$rec_defaults = array(constants::M_REPLYMP3VOICE  => 1,constants::M_REPLYVIDEO  => 1);
 	$settings->add(new admin_setting_configmulticheckbox(constants::M_COMPONENT . '/allowedrecorders',
 						   get_string('allowedrecorders', constants::M_COMPONENT),
 						   get_string('allowedrecordersdetails', constants::M_COMPONENT), $rec_defaults,$rec_options));
 						   
 	//show current feedback on feedback form
-	$yesno_options = array( 0 => get_string("no", constants::M_COMPONENT),
-				1 => get_string("yes", constants::M_COMPONENT));
+	$yesno_options = utils::fetch_options_yesno();
 	$settings->add(new admin_setting_configselect(constants::M_COMPONENT . '/showcurrentfeedback',
 					new lang_string('showcurrentfeedback', constants::M_COMPONENT),
 					new lang_string('showcurrentfeedbackdetails', constants::M_COMPONENT), 1, $yesno_options));

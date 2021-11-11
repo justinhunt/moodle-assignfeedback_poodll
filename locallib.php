@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use assignfeedback_poodll\constants;
+use assignfeedback_poodll\utils;
 
 /**
  * library class for PoodLL feedback plugin extending feedback plugin base class
@@ -107,6 +108,13 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		if(array_search(constants::M_REPLYSNAPSHOT,$allowed_recorders)!==false){
 			$recorderoptions[constants::M_REPLYSNAPSHOT] = get_string("replysnapshot", constants::M_COMPONENT);
 		}
+
+		//determine our active or inactive status. Active is a way of allowing old feedbacks to display, but no new ones to appear
+        $active = $this->get_config('active');
+		//false means that this setting has not been set yet, and in that case it ought to be active
+        if($active===false){
+            $active = 1;
+        }
 		
 	
 	$mform->addElement('select', constants::M_COMPONENT . '_recordertype', get_string("recordertype", constants::M_COMPONENT), $recorderoptions);
@@ -140,11 +148,18 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 				$mform->disabledIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_recordertype', 'ne', constants::M_REPLYWHITEBOARD );
 		}//end of if whiteboard
 
+        $yesnooptions = utils::fetch_options_yesno();
+        $mform->addElement('select', constants::M_COMPONENT . '_active', get_string("active", constants::M_COMPONENT), $yesnooptions);
+        $mform->setDefault(constants::M_COMPONENT . '_active', $active);
+        $mform->disabledIf(constants::M_COMPONENT . '_active', constants::M_COMPONENT . '_enabled', 'notchecked');
+        $mform->addHelpButton(constants::M_COMPONENT . '_active','active', constants::M_COMPONENT);
+
         //If M3.4 or higher we can hide elements when we need to
         if($CFG->version >= 2017111300) {
             $mform->hideIf(constants::M_COMPONENT . '_recordertype', constants::M_COMPONENT . '_enabled', 'notchecked');
             $mform->hideIf(constants::M_COMPONENT . '_downloadsok', constants::M_COMPONENT . '_enabled', 'notchecked');
             $mform->hideIf(constants::M_COMPONENT . '_boardsize', constants::M_COMPONENT . '_enabled', 'notchecked');
+            $mform->hideIf(constants::M_COMPONENT . '_active', constants::M_COMPONENT . '_enabled', 'notchecked');
         }
 
     }//end of function
@@ -167,6 +182,13 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		}else{
 			$this->set_config('boardsize', '320x320');
 		}
+
+        //active
+        if(isset($data->{constants::M_COMPONENT . '_active'})){
+            $this->set_config('active', $data->{constants::M_COMPONENT . '_active'});
+        }else{
+            $this->set_config('active', 1);
+        }
 		
 	
         return true;
@@ -305,6 +327,12 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 			$PAGE->requires->js_init_call('M.assignfeedback_poodll.init',array($opts),false);
         }
 
+        //active
+        $active = $this->get_config('active');
+        if($active===false){
+            $active=1;
+        }
+
 		//We prepare our form here and fetch/save data in SAVE method
 		$usercontextid=context_user::instance($USER->id)->id;
 		$draftitemid = file_get_submitted_draft_itemid(constants::M_FILENAMECONTROL);
@@ -316,7 +344,17 @@ class assign_feedback_poodll extends assign_feedback_plugin {
 		$mform->setType('draftitemid', PARAM_INT);
 		$mform->setType('usercontextid', PARAM_INT); 
 		$mform->setType(constants::M_FILENAMECONTROL, PARAM_TEXT);
-	
+
+
+        //if this is inactive we do not want to show the recorders, so we just return here
+        if(!$active){
+
+            $mform->addElement('static', 'poodllfeedbackinactive', '',get_string('poodllfeedbackinactive',constants::M_COMPONENT));
+            //reset the display name so it doesn't show with the recorder
+            $displayname="";
+            return true;
+        }
+
         //no timelimit on recordings
         $timelimit=0;
 

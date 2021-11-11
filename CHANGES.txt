@@ -1,5 +1,8 @@
 Change List
 =========
+Version 3.1.030(Build 2021111100)
+ - added an "active" flag
+
 version 3.1.029(Build 2021061100)
 - further fixes for audio size
 
@@ -7,32 +10,31 @@ version 3.1.028(Build 2021060900)
 - fix for responsive video sizing
 
 version 3.1.027(Build 2021052000)
--responsive players
-
+- responsive players
 
 version 3.1.026(Build 2021031800)
 - added better hide/disble code for feedback options
 
 version 3.1.025(Build 2020112000)
--added video as default option for feedback on install
+- added video as default option for feedback on install
 
 version 3.1.024(Build 2019062600)
--Added reviewfeedback capability
+- Added reviewfeedback capability
 
 version 3.1.03(Build 2018113000)
--better integration of privacy api
+- better integration of privacy api
 
 Version 3.1.02(Build 2018081700)
--fixed bug that stopped local filter settings being applied to feedback for recorders
+- fixed bug that stopped local filter settings being applied to feedback for recorders
 
 Version 3.1.01(Build 2018060100)
 - Fixed bug in snapshot recorder
 
 Version 3.1.0(Build 2018041000)
--Implemented new Moodle Privacy API
+- Implemented new Moodle Privacy API
 
 Version 2017052201
-Removed the Red5 audio recorder and references to Flash or Red5
+-  Removed the Red5 audio recorder and references to Flash or Red5
 
 Version 2016112701
 Fixed an issue where widths were pulled from a  missing poodll property

@@ -22,6 +22,8 @@ There set "Text Cache Lifetime" to "no"
 
 *Please be aware that the PoodLL feedback type relies on the PoodLL Filter being installed, and won't work properly otherwise*
 
+*Multiple markers (Moodle 5.2 and later): when an assignment has several markers, this feedback type keeps one feedback per student, shared by all the markers. The last marker to save replaces the feedback of the others. Use Cloud Poodll feedback or the core feedback comments if each marker needs their own feedback.*
+
 Good luck.
 
 Justin Hunt

@@ -1,5 +1,9 @@
 Change List
 =========
+Version 3.1.031(Build 2026102800)
+ - declared support for Moodle 3.1 to 5.3
+ - tested with Moodle 5.3
+
 Version 3.1.030(Build 2021111100)
  - added an "active" flag
 
